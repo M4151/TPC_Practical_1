@@ -20,23 +20,15 @@ class ApplicationService {
   }
 
   Future<void> updateApplication(ApplicationModel app) async {
-    await supabase
-        .from('applications')
-        .update(app.toJson())
-        .eq('id', app.id);
+    await supabase.from('applications').update(app.toJson()).eq('id', app.id);
   }
 
   Future<void> deleteApplication(String id) async {
-    await supabase
-        .from('applications')
-        .delete()
-        .eq('id', id);
+    await supabase.from('applications').delete().eq('id', id);
   }
 
   Future<List<ApplicationModel>> getAllApplications() async {
-    final response = await supabase
-        .from('applications')
-        .select();
+    final response = await supabase.from('applications').select();
 
     return (response as List)
         .map((json) => ApplicationModel.fromJson(json))
@@ -44,9 +36,6 @@ class ApplicationService {
   }
 
   Future<void> updateStatus(String id, String status) async {
-    await supabase
-        .from('applications')
-        .update({'status': status})
-        .eq('id', id);
+    await supabase.from('applications').update({'status': status}).eq('id', id);
   }
 }
