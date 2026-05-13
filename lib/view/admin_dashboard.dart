@@ -1,89 +1,152 @@
+import 'package:final_tpg_project_p1/viewmodel/viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../viewmodel/viewmodel.dart';
-import '../model/models.dart';
 
-class AdminDashboardScreen extends StatefulWidget {
-  const AdminDashboardScreen({super.key});
+class AdminDashboard extends StatefulWidget {
+  const AdminDashboard({super.key});
 
   @override
-  State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  State<AdminDashboard> createState() =>
+      _AdminDashboardState();
 }
 
-class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
-  String? filterStatus;
-
+class _AdminDashboardState
+    extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    final viewModel = Provider.of<ApplicationViewModel>(context, listen: false);
-    viewModel.fetchAllApplications();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ApplicationViewModel>(
+        context,
+        listen: false,
+      ).fetchAllApplications();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = Provider.of<ApplicationViewModel>(context);
+    final vm =
+        Provider.of<ApplicationViewModel>(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-        actions: [
-          DropdownButton<String>(
-            hint: const Text('Filter by status'),
-            value: filterStatus,
-            items: ['Pending', 'Approved', 'Rejected']
-                .map((status) => DropdownMenuItem(value: status, child: Text(status)))
-                .toList(),
-            onChanged: (val) {
-              setState(() => filterStatus = val);
-            },
-          ),
-        ],
+        title: const Text("Admin Dashboard"),
       ),
-      body: viewModel.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: viewModel.applications.length,
-              itemBuilder: (context, index) {
-                final app = viewModel.applications[index];
 
-                // Apply filter if selected
-                if (filterStatus != null && app.status != filterStatus) {
-                  return const SizedBox.shrink();
-                }
+      body: vm.isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: vm.applications.length,
+              itemBuilder: (context, index) {
+                final app = vm.applications[index];
 
                 return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: ListTile(
-                    title: Text('${app.module1} (${app.module1Level})'),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  margin: const EdgeInsets.all(10),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
-                        Text('Year of Study: ${app.yearOfStudy}'),
+                        Text(
+                          "Student ID: ${app.userId}",
+                          style: const TextStyle(
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          "Year: ${app.yearOfStudy}",
+                        ),
+
+                        Text(
+                          "Module 1: ${app.module1} (${app.module1Level})",
+                        ),
+
                         if (app.module2 != null)
-                          Text('Module 2: ${app.module2} (${app.module2Level ?? ''})'),
-                        Text('Eligible: ${app.isEligible ? "Yes" : "No"}'),
-                        Text('Status: ${app.status}'),
-                        Text('Submitted: ${app.createdAt.toLocal()}'),
-                        Text('Document: ${app.documentUrl}'),
-                      ],
-                    ),
-                    isThreeLine: true,
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (choice) async {
-                        if (choice == 'Approve') {
-                          await viewModel.updateStatus(app.id, 'Approved');
-                        } else if (choice == 'Reject') {
-                          await viewModel.updateStatus(app.id, 'Rejected');
-                        } else if (choice == 'Delete') {
-                          await viewModel.deleteApplication(app.id);
-                        }
-                        await viewModel.fetchAllApplications();
-                      },
-                      itemBuilder: (context) => [
-                        const PopupMenuItem(value: 'Approve', child: Text('Approve')),
-                        const PopupMenuItem(value: 'Reject', child: Text('Reject')),
-                        const PopupMenuItem(value: 'Delete', child: Text('Delete')),
+                          Text(
+                            "Module 2: ${app.module2} (${app.module2Level})",
+                          ),
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          "Status: ${app.status}",
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Row(
+                          mainAxisAlignment:
+                              MainAxisAlignment
+                                  .spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (app.id == null)
+                                  return;
+
+                                await vm
+                                    .updateStatus(
+                                  app.id!,
+                                  "approved",
+                                );
+
+                                vm.fetchAllApplications();
+                              },
+                              child: const Text(
+                                "Approve",
+                              ),
+                            ),
+
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (app.id == null)
+                                  return;
+
+                                await vm
+                                    .updateStatus(
+                                  app.id!,
+                                  "rejected",
+                                );
+
+                                vm.fetchAllApplications();
+                              },
+                              style: ElevatedButton
+                                  .styleFrom(
+                                backgroundColor:
+                                    Colors.red,
+                              ),
+                              child: const Text(
+                                "Reject",
+                              ),
+                            ),
+
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete,
+                              ),
+                              onPressed: () async {
+                                if (app.id == null)
+                                  return;
+
+                                await vm
+                                    .deleteApplication(
+                                  app.id!,
+                                );
+
+                                vm.fetchAllApplications();
+                              },
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),

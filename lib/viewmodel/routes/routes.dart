@@ -1,44 +1,62 @@
+// Student Numbers: 223021599
+// Student Names  : Brandon Lombaard
+// Question: Routes
+
+import 'package:final_tpg_project_p1/view/login.dart';
 import 'package:flutter/material.dart';
-import '/view/login.dart';
-import '/view/application_form.dart';
-import '/view/application_detail.dart';
-import '/view/home_screen.dart';
-import '/view/admin_dashboard.dart';
-import '/model/models.dart'; // <-- Import ApplicationModel
 
 class AppRoutes {
-  static const String login = '/login';
-  static const String home = '/home';
-  static const String applicationForm = '/applicationForm';
-  static const String applicationDetail = '/applicationDetail';
-  static const String adminDashboard = '/adminDashboard';
+  static const String login = '/';
+  static const String studentHome = '/student/home';
+  static const String applicationForm = '/student/apply';
+  static const String applicationDetail = '/student/detail';
+  static const String adminDashboard = '/admin/dashboard';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
 
-      case home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
-
-      case applicationForm:
-        return MaterialPageRoute(builder: (_) => const ApplicationFormScreen());
-
-      case applicationDetail:
-        // Cast arguments to ApplicationModel
-        final args = settings.arguments as ApplicationModel;
+      // TODO (view team): replace _Placeholder with StudentHomeScreen
+      case studentHome:
         return MaterialPageRoute(
-          builder: (_) => ApplicationDetailScreen(application: args),
+          builder: (_) => const _Placeholder('Student Home'),
         );
 
+      // TODO (view team): replace _Placeholder with ApplicationFormScreen
+      case applicationForm:
+        return MaterialPageRoute(
+          builder: (_) => const _Placeholder('Application Form'),
+        );
+
+      // TODO (view team): replace _Placeholder with ApplicationDetailScreen
+      // settings.arguments will be an ApplicationModel
+      case applicationDetail:
+        return MaterialPageRoute(
+          builder: (_) => const _Placeholder('Application Detail'),
+        );
+
+      // TODO (view team): replace _Placeholder with AdminDashboardScreen
       case adminDashboard:
-        return MaterialPageRoute(builder: (_) => const AdminDashboardScreen());
+        return MaterialPageRoute(
+          builder: (_) => const _Placeholder('Admin Dashboard'),
+        );
 
       default:
-        return MaterialPageRoute(
-          builder: (_) =>
-              const Scaffold(body: Center(child: Text('Route not found'))),
-        );
+        return MaterialPageRoute(builder: (_) => const LoginScreen());
     }
+  }
+}
+
+class _Placeholder extends StatelessWidget {
+  final String label;
+  const _Placeholder(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(label)),
+      body: Center(child: Text('$label — coming soon')),
+    );
   }
 }
